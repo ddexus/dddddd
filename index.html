@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Отправка данных в Google Таблицу</title>
+  <style>
+    body {
+        height: 100vh;
+        width: 100vw;
+        background-color: #666666;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    #dataForm {
+        width: 555.4px;
+        height: 555.3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #0000009d;
+        border-radius: 14.88px;
+        box-shadow: 3.33px 3.33px 3.33px #000;
+    }
+    label {
+        font-size: 22.2px;
+    }
+    button {
+        margin: 7.77px;
+        font-size: 22.2px;
+        cursor: pointer;
+    }
+    input, textarea {
+        font-size: 14.88px;
+    }
+  </style>
+</head>
+<body>
+  <form id="dataForm">
+    <h1>Форма для отправки данных</h1>
+    <label for="name">Имя:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="surname">Фамилия:</label>
+    <input type="text" id="surname" name="surname" required>
+    <br>
+    <label for="patronymic">Отчество:</label>
+    <input type="text" id="patronymic" name="patronymic" required>
+    <br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <br>
+    <label for="message">Сообщение:</label>
+    <textarea id="message" name="message" required></textarea>
+    <br><br><br>
+    <button type="submit">Отправить</button>
+    <br>
+  </form>
+
+  <div id="response"></div>
+  <script>
+    // URL вашего веб-приложения из Google Apps Script
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyN-DJsRGylNdRVu5RgyguSWc5YcwnwiJ5MsNzERYbRk86zimvd3TyRkZl50egVSXnMZA/exec";
+
+    document.getElementById('dataForm').addEventListener('submit', async (event) => {
+      event.preventDefault(); // Предотвращаем стандартное поведение формы
+
+      // Собираем данные из формы
+      const formData = {
+        name: document.getElementById('name').value,
+        surname: document.getElementById('surname').value,
+        patronymic: document.getElementById('patronymic').value,
+        email: document.getElementById('email').value,
+        message: document.getElementById('message').value,
+      };
+
+      try {
+        const proxyURL = "https://cors-anywhere.herokuapp.com/";
+        const response = await fetch(proxyURL + scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        });
+        // Обрабатываем ответ от сервера
+        const result = await response.json();
+        document.getElementById('response').innerText =
+          result.status === "success"
+            ? "Данные успешно отправлены!"
+            : `Ошибка: ${result.message}`;
+      } catch (error) {
+        // Обрабатываем ошибки запроса
+        document.getElementById('response').innerText = "Ошибка при отправке данных!";
+        console.error("Ошибка:", error);
+      }
+    });
+  </script>
+</body>
+</html>
